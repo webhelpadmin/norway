@@ -1,31 +1,41 @@
 ﻿@{
-    ViewBag.Title = "Home Page";
+    ViewBag.Title = "UploadFile";
 }
 
-<div class="jumbotron">
-    <h1>ASP.NET</h1>
-    <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS and JavaScript.</p>
-    <p><a href="https://asp.net" class="btn btn-primary btn-lg">Learn more &raquo;</a></p>
-</div>
+<h2>Please select & upload the file in @ViewBag.AllowedFileExtensions format</h2>
 
-<div class="row">
-    <div class="col-md-4">
-        <h2>Getting started</h2>
-        <p>
-            ASP.NET MVC gives you a powerful, patterns-based way to build dynamic websites that
-            enables a clean separation of concerns and gives you full control over markup
-            for enjoyable, agile development.
-        </p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301865">Learn more &raquo;</a></p>
+@using (Html.BeginForm("Upload", "Home", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    <div>
+        @Html.TextBox("file", "", new { type = "file" }) <br />
+
+        <input id="submitBtn" type="submit" value="Upload" disabled="" />
+
+        <p id="size"></p>
+        <br />
+        <span id="output">@ViewBag.Message</span>
+        <br />
+
     </div>
-    <div class="col-md-4">
-        <h2>Get more libraries</h2>
-        <p>NuGet is a free Visual Studio extension that makes it easy to add, remove, and update libraries and tools in Visual Studio projects.</p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301866">Learn more &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>Web Hosting</h2>
-        <p>You can easily find a web hosting company that offers the right mix of features and price for your applications.</p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301867">Learn more &raquo;</a></p>
-    </div>
-</div>
+}
+@section scripts
+{
+    <script type="text/javascript">
+        $(document).ready(
+            function () {
+
+            $('#file').change( function() {
+                    var selectedFileSizeInMb = (this.files[0].size / 1024 / 1024).toFixed(2);
+                    var maxFileSizeInMb = Math.round((@ViewBag.MaximumFileSize / 1024 / 1024));
+                    if (selectedFileSizeInMb <= maxFileSizeInMb && selectedFileSizeInMb >= 0) {
+                        $('#submitBtn').prop('disabled', false);
+                        $('#output').empty();
+                    } else {
+                        $('#submitBtn').prop('disabled', true);
+                        $('#output').html('File too big, please select a file less than ' + maxFileSizeInMb + ' mb');
+                }
+            });
+        });
+    </script>
+}
